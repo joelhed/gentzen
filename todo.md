@@ -1,12 +1,14 @@
 ## Proof of concept
 
 - [ ] Render proofs
-  - [ ] Change the elm rendering to use a separate html file for custom CSS
-  - [ ] Extract styling into a separate CSS file
-  - [ ] Make the drawing area a bit more distinct and centered
-  - [ ] Center the proof
-  - [ ] Make sure the horizontal line between the premises and the conclusion only
+  - [x] Change the elm rendering to use a separate html file for custom CSS
+  - [x] Extract styling into a separate CSS file
+  - [x] Make the drawing area a bit more distinct and centered
+  - [x] Center the proof
+  - [x] Make sure the horizontal line between the premises and the conclusion only
         extend to the edges of the farthest out premises
+        - This is semi-done/done for now. Turns out it's pretty hard to do well. I took inspiration
+          from [this Medium article](https://medium.com/@ross.angus/sitemaps-and-dom-structure-from-nested-unordered-lists-eab2b02950cf), but using that doesn't align the line with the statements perfectly, but it trims down the edges a bit. (2020-05-02)
 - [ ] Make proofs editable
   - [ ] Editable statements
   - [ ] Premises (add and remove)

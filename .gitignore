@@ -1,1 +1,5 @@
+*.swp
 elm-stuff
+
+# compilation target
+main.js

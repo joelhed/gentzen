@@ -1,0 +1,58 @@
+body {
+  font-family: helvetica, sans-serif;
+}
+
+.container {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.proof-area {
+  font-family: Times new roman, serif;
+  background-color: #F0F0F0;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.proof {
+  display: inline-block;
+  position: relative;
+}
+
+.premises {
+}
+
+.premise {
+  display: inline-block;
+  position: relative;
+  padding: 5px;
+}
+
+.premises .premise:after {
+  border-top: 1px solid black;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.premises .premise:first-child:after {
+  left: 35%;
+}
+
+.premises .premise:last-child:after {
+  right: 35%;
+}
+
+.conclusion {
+  text-align: center;
+  padding-top: 5px;
+}
+
+.statement {
+  position: relative;
+  padding: 0.5em;
+}
+

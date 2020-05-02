@@ -1,7 +1,7 @@
 module Main exposing (..)
 import Browser
 import Html exposing (Html, h1, div, span, text, hr)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, class)
 
 
 main = Browser.document
@@ -31,7 +31,10 @@ init = always
       
       Proof 
         [ Proof
-          [ Assumption (Statement "P"), Assumption (Statement "P -> Q") ]
+          [ Proof
+            [ Assumption (Statement "P"), Assumption (Statement "P -> (Q ^ R)") ]
+            (Statement "Q ^ R")
+          ]
           (Statement "Q")
         , Assumption (Statement "~Q")
         ]
@@ -56,8 +59,13 @@ subscriptions = always Sub.none
 
 -- View
 
+
+wrapInPremiseDiv : Html Msg -> Html Msg
+wrapInPremiseDiv x = div [ class "premise" ] [ x ]
+
+
 renderStatement : Statement -> Html Msg
-renderStatement (Statement s) = span [ style "padding" "0.5em" ] [text s]
+renderStatement (Statement s) = span [ class "statement" ] [text s]
   
 
 renderProof : Proof -> Html Msg
@@ -67,22 +75,24 @@ renderProof proof =
       renderStatement statement
 
     Proof premises conclusion ->
-      div [ style "display" "inline-block" ]
-        [ div [] <| List.map renderProof premises
-        , hr [] []
-        , div [ style "text-align" "center" ] [ renderStatement conclusion ]
+      div [ class "proof" ]
+        [ div [ class "premises" ] <| List.map (wrapInPremiseDiv << renderProof) premises
+        -- , hr [] []
+        , div [ class "conclusion" ] [ renderStatement conclusion ]
         ]
 
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "TEST"
+    { title = "Gentzen"
     , body =
-      [ h1 [] [ text "TEST"]
-      -- The drawing surface
-      , div []
-          [ renderProof model.proof
-          ]
+      [ div [ class "container" ] 
+        [ h1 [] [ text "Gentzen proof editor"]
+        -- The drawing surface
+        , div [ class "proof-area" ]
+            [ renderProof model.proof
+            ]
+        ]
       ]
     }
 
