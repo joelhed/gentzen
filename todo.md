@@ -1,6 +1,6 @@
 ## Proof of concept
 
-- [ ] Render proofs
+- [x] Render proofs
   - [x] Change the elm rendering to use a separate html file for custom CSS
   - [x] Extract styling into a separate CSS file
   - [x] Make the drawing area a bit more distinct and centered
@@ -10,7 +10,9 @@
         - This is semi-done/done for now. Turns out it's pretty hard to do well. I took inspiration
           from [this Medium article](https://medium.com/@ross.angus/sitemaps-and-dom-structure-from-nested-unordered-lists-eab2b02950cf), but using that doesn't align the line with the statements perfectly, but it trims down the edges a bit. (2020-05-02)
 - [ ] Make proofs editable
-  - [ ] Editable statements
+  - [x] Editable statements
+        - Visually, this isn't very pleasing. The abstraction level might also be
+          completely off, but we'll get to that when we get to it. (2020-05-02)
   - [ ] Premises (add and remove)
   - [ ] Subproofs (add and remove)
   - [ ] Discharge brackets (add and remove)

@@ -1,7 +1,9 @@
 module Main exposing (..)
 import Browser
-import Html exposing (Html, h1, div, span, text, hr)
-import Html.Attributes exposing (style, class)
+import Html exposing (Html, h1, div, span, text, input)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onInput)
+import Tree
 
 
 main = Browser.document
@@ -16,9 +18,16 @@ main = Browser.document
 
 type Statement = Statement String
 
-type Proof
-  = Assumption Statement
-  | Proof (List Proof) Statement
+type alias Proof = Tree.Node Statement
+type alias IndexedProof = Tree.Node ( Int, Statement )
+
+assumption : Statement -> Proof
+assumption s = Tree.Node s []
+
+
+inference : List Proof -> Statement -> Proof
+inference premises conclusion = Tree.Node conclusion premises
+
 
 type alias Model =
   { proof: Proof
@@ -29,14 +38,14 @@ init : () -> ( Model, Cmd Msg )
 init = always
   ( { proof =
       
-      Proof 
-        [ Proof
-          [ Proof
-            [ Assumption (Statement "P"), Assumption (Statement "P -> (Q ^ R)") ]
+      inference 
+        [ inference
+          [ inference
+            [ assumption (Statement "P"), assumption (Statement "P -> (Q ^ R)") ]
             (Statement "Q ^ R")
           ]
           (Statement "Q")
-        , Assumption (Statement "~Q")
+        , assumption (Statement "~Q")
         ]
         (Statement "~P")
     }
@@ -44,14 +53,27 @@ init = always
   )
 
 
-type Msg = Nothing
+type Msg
+  = UpdateStatement Int String
+
+
+changeIfIdx : Int -> String -> Int -> Statement -> Statement
+changeIfIdx idx1 newString idx2 oldStatement =
+  if idx1 == idx2 then
+    (Statement newString)
+  else
+    oldStatement
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  ( model
-  , Cmd.none
-  )
+  case msg of
+    UpdateStatement idx s ->
+      ( { model
+        | proof = Tree.indexedMap (changeIfIdx idx s) model.proof
+        }
+      , Cmd.none
+      )
 
 
 subscriptions : Model -> Sub Msg
@@ -64,22 +86,34 @@ wrapInPremiseDiv : Html Msg -> Html Msg
 wrapInPremiseDiv x = div [ class "premise" ] [ x ]
 
 
-renderStatement : Statement -> Html Msg
-renderStatement (Statement s) = span [ class "statement" ] [text s]
-  
+renderStatement : Int -> Statement -> Html Msg
+renderStatement idx (Statement s) =
+  input
+    [ class "statement"
+    , value s
+    , onInput (UpdateStatement idx)
+    ]
+    []
+
+
+renderIndexedProof : IndexedProof -> Html Msg
+renderIndexedProof proof = 
+  case proof of
+    Tree.Node (idx, statement) [] ->
+      renderStatement idx statement
+
+    Tree.Node (idx, conclusion) premises ->
+        div [ class "proof" ]
+          [ div [ class "premises" ] <| List.map (wrapInPremiseDiv << renderIndexedProof) premises
+          -- , hr [] []
+          , div [ class "conclusion" ] [ renderStatement idx conclusion ]
+          ]
+
 
 renderProof : Proof -> Html Msg
-renderProof proof = 
-  case proof of
-    Assumption statement ->
-      renderStatement statement
-
-    Proof premises conclusion ->
-      div [ class "proof" ]
-        [ div [ class "premises" ] <| List.map (wrapInPremiseDiv << renderProof) premises
-        -- , hr [] []
-        , div [ class "conclusion" ] [ renderStatement conclusion ]
-        ]
+renderProof proof =
+  Tree.indexedMap (\idx statement -> ( idx, statement )) proof
+  |> renderIndexedProof
 
 
 view : Model -> Browser.Document Msg
