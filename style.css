@@ -60,6 +60,10 @@ body {
   padding: 0.5em;
 }
 
+.discharge-off {
+  color: #CCC;
+}
+
 .assumption-line {
   border-top: 2px dashed #3333;
   /*

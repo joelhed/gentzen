@@ -16,7 +16,7 @@ main = Browser.document
 
 -- Model
 
-type Statement = Statement String
+type Statement = Statement String Bool
 
 type alias Proof = Tree.Node Statement
 type alias EnumeratedProof = Tree.Node ( Int, Statement )
@@ -27,11 +27,11 @@ type alias Model =
 
 
 assumption : String -> Proof
-assumption s = Tree.Node (Statement s) []
+assumption s = Tree.Node (Statement s False) []
 
 
 inference : List Proof -> String -> Proof
-inference premises conclusion = Tree.Node (Statement conclusion) premises
+inference premises conclusion = Tree.Node (Statement conclusion False) premises
 
 
 init : () -> ( Model, Cmd Msg )
@@ -57,14 +57,26 @@ type Msg
   = UpdateStatement Int String
   | AddPremise Int
   | RemovePremise Int
+  | ToggleDischarge Int
 
 
-changeIfIdx : Int -> String -> Int -> Statement -> Statement
-changeIfIdx idx1 newString idx2 oldStatement =
-  if idx1 == idx2 then
-    (Statement newString)
-  else
-    oldStatement
+updateStatementWithIdx : Int -> (Statement -> Statement) -> Proof -> Proof
+updateStatementWithIdx idx1 f =
+  Tree.indexedMap <| \idx2 ->
+    if idx1 == idx2 then
+      f
+    else
+      identity
+
+
+updateStatementString : String -> Statement -> Statement
+updateStatementString newString (Statement _ isDischarged) =
+  Statement newString isDischarged
+
+
+toggleStatementDischarge : Statement -> Statement
+toggleStatementDischarge (Statement s isDischarged) =
+  Statement s (not isDischarged)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -72,7 +84,7 @@ update msg model =
   case msg of
     UpdateStatement idx s ->
       ( { model
-        | proof = Tree.indexedMap (changeIfIdx idx s) model.proof
+        | proof = updateStatementWithIdx idx (updateStatementString s) model.proof
         }
       , Cmd.none
       )
@@ -92,6 +104,14 @@ update msg model =
       , Cmd.none
       )
 
+    ToggleDischarge idx ->
+      ( { model
+        | proof = updateStatementWithIdx idx toggleStatementDischarge model.proof
+        }
+      , Cmd.none
+      )
+      
+
 
 subscriptions : Model -> Sub Msg
 subscriptions = always Sub.none
@@ -108,12 +128,28 @@ renderRemovePremiseButton idx =
   button [ onClick (RemovePremise idx) ] [ text "-" ]
 
 
-renderStatement : Int -> Statement -> Html Msg
-renderStatement idx (Statement s) =
+renderStatement : Int -> Bool -> Statement -> Html Msg
+renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
+  let
+    dischargeStyle =
+      if isDischarged then
+        [ onClick (ToggleDischarge idx) ]
+      else
+        [ onClick (ToggleDischarge idx), class "discharge-off" ]
+
+    surroundWithBrackets l =
+      if renderDischargeBrackets then
+        [ span dischargeStyle [ text "[" ] ]
+        ++ l
+        ++ [ span dischargeStyle [ text "]" ] ]
+      else
+        l
+  in
   span [ class "statement" ]
-    [ input [ value s, onInput (UpdateStatement idx) ] []
-    , renderRemovePremiseButton idx
-    ]
+    <| surroundWithBrackets
+      [ input [ value s, onInput (UpdateStatement idx) ] []
+      , renderRemovePremiseButton idx
+      ]
 
 
 renderAddPremiseButton : Int -> Html Msg
@@ -127,7 +163,7 @@ renderEnumeratedProof proof =
     Tree.Node (idx, statement) [] ->
       div []
         [ hr [ class "assumption-line" , onClick (AddPremise idx) ] []
-        , renderStatement idx statement
+        , renderStatement idx True statement
         ]
 
     Tree.Node (idx, conclusion) premises ->
@@ -135,7 +171,7 @@ renderEnumeratedProof proof =
         [ div [ class "premises" ] 
           <| (List.map (wrapInPremiseDiv << renderEnumeratedProof) premises)
           ++ [ renderAddPremiseButton idx ]
-        , div [ class "conclusion" ] [ renderStatement idx conclusion ]
+        , div [ class "conclusion" ] [ renderStatement idx False conclusion ]
         ]
 
 
