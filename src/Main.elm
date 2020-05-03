@@ -144,10 +144,22 @@ renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
         ++ [ span dischargeStyle [ text "]" ] ]
       else
         l
+
+    -- WARNING: This isn't calculated from the actual character width, but came from
+    -- experimentation. It might not always work.
+    fieldWidth =
+      (Basics.max (7 * String.length s) 10)
+      
   in
   span [ class "statement" ]
     <| surroundWithBrackets
-      [ input [ value s, onInput (UpdateStatement idx) ] []
+      [ input
+        [ placeholder "..."
+        , value s
+        , onInput (UpdateStatement idx)
+        , style "width" <| String.fromInt fieldWidth ++ "px"
+        ]
+        []
       ]
       ++ [ renderRemovePremiseButton idx ]
 
