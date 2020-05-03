@@ -13,9 +13,10 @@
   - [x] Editable statements
         - Visually, this isn't very pleasing. The abstraction level might also be
           completely off, but we'll get to that when we get to it. (2020-05-02)
-  - [ ] Premises (add and remove)
+  - [x] Premises (add and remove)
   - [ ] Subproofs (add and remove)
   - [ ] Discharge brackets (add and remove)
+- [ ] Improve UX
 
 ## Potential future features
 

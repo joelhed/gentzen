@@ -1,8 +1,8 @@
 module Main exposing (..)
 import Browser
-import Html exposing (Html, h1, div, span, text, input)
+import Html exposing (Html, h1, div, span, text, input, button)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onClick)
 import Tree
 
 
@@ -26,12 +26,12 @@ type alias Model =
   }
 
 
-assumption : Statement -> Proof
-assumption s = Tree.Node s []
+assumption : String -> Proof
+assumption s = Tree.Node (Statement s) []
 
 
-inference : List Proof -> Statement -> Proof
-inference premises conclusion = Tree.Node conclusion premises
+inference : List Proof -> String -> Proof
+inference premises conclusion = Tree.Node (Statement conclusion) premises
 
 
 init : () -> ( Model, Cmd Msg )
@@ -41,13 +41,13 @@ init = always
       inference 
         [ inference
           [ inference
-            [ assumption (Statement "P"), assumption (Statement "P -> (Q ^ R)") ]
-            (Statement "Q ^ R")
+            [ assumption "P", assumption "P -> (Q ^ R)" ]
+            "Q ^ R"
           ]
-          (Statement "Q")
-        , assumption (Statement "~Q")
+          "Q"
+        , assumption "~Q"
         ]
-        (Statement "~P")
+        "~P"
     }
   , Cmd.none
   )
@@ -55,6 +55,8 @@ init = always
 
 type Msg
   = UpdateStatement Int String
+  | AddPremise Int
+  | RemovePremise Int
 
 
 changeIfIdx : Int -> String -> Int -> Statement -> Statement
@@ -74,6 +76,21 @@ update msg model =
         }
       , Cmd.none
       )
+    
+    AddPremise idx ->
+      ( { model
+        | proof = Tree.addChildAtIdx idx (assumption "") model.proof
+        }
+      , Cmd.none
+      )
+
+    RemovePremise idx ->
+      ( { model
+        | proof = Tree.removeNodeAtIdx idx model.proof
+          |> Maybe.withDefault model.proof
+        }
+      , Cmd.none
+      )
 
 
 subscriptions : Model -> Sub Msg
@@ -86,14 +103,22 @@ wrapInPremiseDiv : Html Msg -> Html Msg
 wrapInPremiseDiv x = div [ class "premise" ] [ x ]
 
 
+renderRemovePremiseButton : Int -> Html Msg
+renderRemovePremiseButton idx =
+  button [ onClick (RemovePremise idx) ] [ text "-" ]
+
+
 renderStatement : Int -> Statement -> Html Msg
 renderStatement idx (Statement s) =
-  input
-    [ class "statement"
-    , value s
-    , onInput (UpdateStatement idx)
+  span [ class "statement" ]
+    [ input [ value s, onInput (UpdateStatement idx) ] []
+    , renderRemovePremiseButton idx
     ]
-    []
+
+
+renderAddPremiseButton : Int -> Html Msg
+renderAddPremiseButton idx =
+  button [ onClick (AddPremise idx) ] [ text "+" ]
 
 
 renderEnumeratedProof : EnumeratedProof -> Html Msg
@@ -104,7 +129,9 @@ renderEnumeratedProof proof =
 
     Tree.Node (idx, conclusion) premises ->
         div [ class "proof" ]
-          [ div [ class "premises" ] <| List.map (wrapInPremiseDiv << renderEnumeratedProof) premises
+          [ div [ class "premises" ] 
+            <| (List.map (wrapInPremiseDiv << renderEnumeratedProof) premises)
+            ++ [ renderAddPremiseButton idx ]
           , div [ class "conclusion" ] [ renderStatement idx conclusion ]
           ]
 
