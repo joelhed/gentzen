@@ -2,6 +2,11 @@ body {
   font-family: helvetica, sans-serif;
 }
 
+button {
+  background-color: transparent;
+  border: none;
+}
+
 .container {
   max-width: 800px;
   margin: 0 auto;
@@ -60,12 +65,19 @@ body {
   padding: 0.5em;
 }
 
+.discharge:hover {
+  border-radius: 2px;
+  background-color: #00F3;
+}
+
 .discharge-off {
   color: #CCC;
 }
 
 .assumption-line {
-  border-top: 2px dashed #3333;
+  border-bottom: 1px dashed #3333;
+  border-left: none;
+  border-top: none;
   /*
   content: "";
   position: absolute;
@@ -73,7 +85,23 @@ body {
   right: 0;
   top: 0;
   */
+  height: 10px;
   width: 75%;
-  margin: 8 auto;
+}
+
+.assumption-line:hover {
+  border-bottom: 1px solid #0A0A;
+}
+
+.add-premise:hover {
+  border-radius: 2px;
+  background-color: #0F02;
+  color: green;
+}
+
+.remove-premise:hover {
+  border-radius: 2px;
+  background-color: #F002;
+  color: red;
 }
 

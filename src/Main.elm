@@ -124,17 +124,18 @@ wrapInPremiseDiv x = div [ class "premise" ] [ x ]
 
 renderRemovePremiseButton : Int -> Html Msg
 renderRemovePremiseButton idx =
-  button [ onClick (RemovePremise idx) ] [ text "-" ]
+  button [ class "remove-premise", onClick (RemovePremise idx) ] [ text "✕" ]
 
 
 renderStatement : Int -> Bool -> Statement -> Html Msg
 renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
   let
     dischargeStyle =
+      [ onClick (ToggleDischarge idx), class "discharge" ] ++
       if isDischarged then
-        [ onClick (ToggleDischarge idx) ]
+        []
       else
-        [ onClick (ToggleDischarge idx), class "discharge-off" ]
+        [ class "discharge-off" ]
 
     surroundWithBrackets l =
       if renderDischargeBrackets then
@@ -147,8 +148,8 @@ renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
   span [ class "statement" ]
     <| surroundWithBrackets
       [ input [ value s, onInput (UpdateStatement idx) ] []
-      , renderRemovePremiseButton idx
       ]
+      ++ [ renderRemovePremiseButton idx ]
 
 
 renderAssumption : Int -> Statement -> Html Msg
@@ -161,7 +162,7 @@ renderAssumption idx statement =
 
 renderAddPremiseButton : Int -> Html Msg
 renderAddPremiseButton idx =
-  button [ onClick (AddPremise idx) ] [ text "+" ]
+  button [ class "add-premise", onClick (AddPremise idx) ] [ text "+" ]
 
 
 renderSubproof : Int -> Statement -> List EnumeratedProof -> Html Msg
