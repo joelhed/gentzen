@@ -37,8 +37,7 @@ inference premises conclusion = Tree.Node (Statement conclusion False) premises
 init : () -> ( Model, Cmd Msg )
 init = always
   ( { proof =
-      
-      inference 
+      inference
         [ inference
           [ inference
             [ assumption "P", assumption "P -> (Q ^ R)" ]
@@ -88,7 +87,7 @@ update msg model =
         }
       , Cmd.none
       )
-    
+
     AddPremise idx ->
       ( { model
         | proof = Tree.addChildAtIdx idx (assumption "") model.proof
@@ -110,7 +109,7 @@ update msg model =
         }
       , Cmd.none
       )
-      
+
 
 
 subscriptions : Model -> Sub Msg
@@ -152,27 +151,37 @@ renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
       ]
 
 
+renderAssumption : Int -> Statement -> Html Msg
+renderAssumption idx statement =
+  div []
+    [ hr [ class "assumption-line" , onClick (AddPremise idx) ] []
+    , renderStatement idx True statement
+    ]
+
+
 renderAddPremiseButton : Int -> Html Msg
 renderAddPremiseButton idx =
   button [ onClick (AddPremise idx) ] [ text "+" ]
 
 
+renderSubproof : Int -> Statement -> List EnumeratedProof -> Html Msg
+renderSubproof idx conclusion premises =
+  div [ class "proof" ]
+    [ div [ class "premises" ]
+      <| (List.map (wrapInPremiseDiv << renderEnumeratedProof) premises)
+      ++ [ renderAddPremiseButton idx ]
+    , div [ class "conclusion" ] [ renderStatement idx False conclusion ]
+    ]
+
+
 renderEnumeratedProof : EnumeratedProof -> Html Msg
-renderEnumeratedProof proof = 
+renderEnumeratedProof proof =
   case proof of
     Tree.Node (idx, statement) [] ->
-      div []
-        [ hr [ class "assumption-line" , onClick (AddPremise idx) ] []
-        , renderStatement idx True statement
-        ]
+      renderAssumption idx statement
 
     Tree.Node (idx, conclusion) premises ->
-      div [ class "proof" ]
-        [ div [ class "premises" ] 
-          <| (List.map (wrapInPremiseDiv << renderEnumeratedProof) premises)
-          ++ [ renderAddPremiseButton idx ]
-        , div [ class "conclusion" ] [ renderStatement idx False conclusion ]
-        ]
+      renderSubproof idx conclusion premises
 
 
 renderProof : Proof -> Html Msg
@@ -183,7 +192,7 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "Gentzen"
     , body =
-      [ div [ class "container" ] 
+      [ div [ class "container" ]
         [ h1 [] [ text "Gentzen proof editor"]
         -- The drawing surface
         , div [ class "proof-area" ]

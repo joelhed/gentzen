@@ -8,7 +8,8 @@
   - [x] Make sure the horizontal line between the premises and the conclusion only
         extend to the edges of the farthest out premises
         - This is semi-done/done for now. Turns out it's pretty hard to do well. I took inspiration
-          from [this Medium article](https://medium.com/@ross.angus/sitemaps-and-dom-structure-from-nested-unordered-lists-eab2b02950cf), but using that doesn't align the line with the statements perfectly, but it trims down the edges a bit. (2020-05-02)
+          from [this Medium article](https://medium.com/@ross.angus/sitemaps-and-dom-structure-from-nested-unordered-lists-eab2b02950cf),
+          but using that doesn't align the line with the statements perfectly, but it trims down the edges a bit. (2020-05-02)
 - [x] Make proofs editable
   - [x] Editable statements
         - Visually, this isn't very pleasing. The abstraction level might also be
