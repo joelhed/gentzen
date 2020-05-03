@@ -53,3 +53,45 @@ indexedMapWithStartAndEnd f =
 indexedMap : (Int -> a -> b) -> Node a -> Node b
 indexedMap f node = Tuple.second <| indexedMapWithStartAndEnd f 0 node
 
+
+enumerate : Node a -> Node (Int, a)
+enumerate = indexedMap (\idx item -> (idx, item))
+
+
+unenumerate : Node (Int, a) -> Node a
+unenumerate = map (\(_, item) -> item)
+
+
+modifyEnumeratedNodeWithIdx : Int -> (Node a -> Node a) -> Node (Int, a) -> Node a
+modifyEnumeratedNodeWithIdx idx1 f (Node (idx2, item) children as node) = 
+  if idx1 == idx2 then
+    f (unenumerate node)
+  else
+    Node item (List.map (modifyEnumeratedNodeWithIdx idx1 f) children)
+
+
+modifyNodeWithIdx : Int -> (Node a -> Node a) -> Node a -> Node a
+modifyNodeWithIdx idx f node =
+  modifyEnumeratedNodeWithIdx idx f (enumerate node)
+
+
+addChildAtIdx : Int -> Node a -> Node a -> Node a
+addChildAtIdx idx newNode =
+  modifyNodeWithIdx idx
+  <| \(Node item children) -> Node item (children ++ [newNode])
+
+
+removeEnumeratedNodeAtIdx : Int -> Node (Int, a) -> Maybe (Node (Int, a))
+removeEnumeratedNodeAtIdx idx1 (Node (idx2, item) children as node) =
+  if idx1 == idx2 then
+    Nothing
+  else
+    Just <| Node (idx2, item)
+      (List.filterMap (removeEnumeratedNodeAtIdx idx1) children)
+
+
+removeNodeAtIdx : Int -> Node a -> Maybe (Node a)
+removeNodeAtIdx idx node =
+  removeEnumeratedNodeAtIdx idx (enumerate node)
+  |> Maybe.map unenumerate
+

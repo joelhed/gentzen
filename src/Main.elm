@@ -19,7 +19,12 @@ main = Browser.document
 type Statement = Statement String
 
 type alias Proof = Tree.Node Statement
-type alias IndexedProof = Tree.Node ( Int, Statement )
+type alias EnumeratedProof = Tree.Node ( Int, Statement )
+
+type alias Model =
+  { proof: Proof
+  }
+
 
 assumption : Statement -> Proof
 assumption s = Tree.Node s []
@@ -27,11 +32,6 @@ assumption s = Tree.Node s []
 
 inference : List Proof -> Statement -> Proof
 inference premises conclusion = Tree.Node conclusion premises
-
-
-type alias Model =
-  { proof: Proof
-  }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -96,24 +96,21 @@ renderStatement idx (Statement s) =
     []
 
 
-renderIndexedProof : IndexedProof -> Html Msg
-renderIndexedProof proof = 
+renderEnumeratedProof : EnumeratedProof -> Html Msg
+renderEnumeratedProof proof = 
   case proof of
     Tree.Node (idx, statement) [] ->
       renderStatement idx statement
 
     Tree.Node (idx, conclusion) premises ->
         div [ class "proof" ]
-          [ div [ class "premises" ] <| List.map (wrapInPremiseDiv << renderIndexedProof) premises
-          -- , hr [] []
+          [ div [ class "premises" ] <| List.map (wrapInPremiseDiv << renderEnumeratedProof) premises
           , div [ class "conclusion" ] [ renderStatement idx conclusion ]
           ]
 
 
 renderProof : Proof -> Html Msg
-renderProof proof =
-  Tree.indexedMap (\idx statement -> ( idx, statement )) proof
-  |> renderIndexedProof
+renderProof = renderEnumeratedProof << Tree.enumerate
 
 
 view : Model -> Browser.Document Msg
