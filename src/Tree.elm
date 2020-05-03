@@ -55,11 +55,11 @@ indexedMap f node = Tuple.second <| indexedMapWithStartAndEnd f 0 node
 
 
 enumerate : Node a -> Node (Int, a)
-enumerate = indexedMap (\idx item -> (idx, item))
+enumerate = indexedMap Tuple.pair
 
 
 unenumerate : Node (Int, a) -> Node a
-unenumerate = map (\(_, item) -> item)
+unenumerate = map Tuple.second
 
 
 modifyEnumeratedNodeWithIdx : Int -> (Node a -> Node a) -> Node (Int, a) -> Node a
