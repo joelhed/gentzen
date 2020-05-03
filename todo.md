@@ -14,7 +14,7 @@
         - Visually, this isn't very pleasing. The abstraction level might also be
           completely off, but we'll get to that when we get to it. (2020-05-02)
   - [x] Premises (add and remove)
-  - [ ] Subproofs (add and remove)
+  - [x] Subproofs (add and remove)
   - [ ] Discharge brackets (add and remove)
 - [ ] Improve UX
 

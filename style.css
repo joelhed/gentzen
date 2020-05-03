@@ -60,3 +60,16 @@ body {
   padding: 0.5em;
 }
 
+.assumption-line {
+  border-top: 2px dashed #3333;
+  /*
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  */
+  width: 75%;
+  margin: 8 auto;
+}
+

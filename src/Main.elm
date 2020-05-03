@@ -1,6 +1,6 @@
 module Main exposing (..)
 import Browser
-import Html exposing (Html, h1, div, span, text, input, button)
+import Html exposing (Html, h1, div, span, text, input, button, hr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
 import Tree
@@ -125,15 +125,18 @@ renderEnumeratedProof : EnumeratedProof -> Html Msg
 renderEnumeratedProof proof = 
   case proof of
     Tree.Node (idx, statement) [] ->
-      renderStatement idx statement
+      div []
+        [ hr [ class "assumption-line" , onClick (AddPremise idx) ] []
+        , renderStatement idx statement
+        ]
 
     Tree.Node (idx, conclusion) premises ->
-        div [ class "proof" ]
-          [ div [ class "premises" ] 
-            <| (List.map (wrapInPremiseDiv << renderEnumeratedProof) premises)
-            ++ [ renderAddPremiseButton idx ]
-          , div [ class "conclusion" ] [ renderStatement idx conclusion ]
-          ]
+      div [ class "proof" ]
+        [ div [ class "premises" ] 
+          <| (List.map (wrapInPremiseDiv << renderEnumeratedProof) premises)
+          ++ [ renderAddPremiseButton idx ]
+        , div [ class "conclusion" ] [ renderStatement idx conclusion ]
+        ]
 
 
 renderProof : Proof -> Html Msg
