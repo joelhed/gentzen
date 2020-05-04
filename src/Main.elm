@@ -122,13 +122,13 @@ wrapInPremiseDiv : Html Msg -> Html Msg
 wrapInPremiseDiv x = div [ class "premise" ] [ x ]
 
 
-renderRemovePremiseButton : Int -> Html Msg
-renderRemovePremiseButton idx =
+viewRemovePremiseButton : Int -> Html Msg
+viewRemovePremiseButton idx =
   button [ class "remove-premise", onClick (RemovePremise idx) ] [ text "✕" ]
 
 
-renderStatement : Int -> Bool -> Statement -> Html Msg
-renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
+viewStatement : Int -> Bool -> Statement -> Html Msg
+viewStatement idx showBrackets (Statement s isDischarged) =
   let
     dischargeStyle =
       [ onClick (ToggleDischarge idx), class "discharge" ] ++
@@ -138,7 +138,7 @@ renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
         [ class "discharge-off" ]
 
     surroundWithBrackets l =
-      if renderDischargeBrackets then
+      if showBrackets then
         [ span dischargeStyle [ text "[" ] ]
         ++ l
         ++ [ span dischargeStyle [ text "]" ] ]
@@ -161,44 +161,44 @@ renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
         ]
         []
       ]
-      ++ [ renderRemovePremiseButton idx ]
+      ++ [ viewRemovePremiseButton idx ]
 
 
-renderAssumption : Int -> Statement -> Html Msg
-renderAssumption idx statement =
+viewAssumption : Int -> Statement -> Html Msg
+viewAssumption idx statement =
   div [ class "assumption" ]
     [ hr [ class "assumption-line" , onClick (AddPremise idx) ] []
-    , renderStatement idx True statement
+    , viewStatement idx True statement
     ]
 
 
-renderAddPremiseButton : Int -> Html Msg
-renderAddPremiseButton idx =
+viewAddPremiseButton : Int -> Html Msg
+viewAddPremiseButton idx =
   button [ class "add-premise", onClick (AddPremise idx) ] [ text "+" ]
 
 
-renderSubproof : Int -> Statement -> List EnumeratedProof -> Html Msg
-renderSubproof idx conclusion premises =
+viewSubproof : Int -> Statement -> List EnumeratedProof -> Html Msg
+viewSubproof idx conclusion premises =
   div [ class "proof" ]
     [ div [ class "premises" ]
-      <| (List.map (wrapInPremiseDiv << renderEnumeratedProof) premises)
-      ++ [ renderAddPremiseButton idx ]
-    , div [ class "conclusion" ] [ renderStatement idx False conclusion ]
+      <| (List.map (wrapInPremiseDiv << viewEnumeratedProof) premises)
+      ++ [ viewAddPremiseButton idx ]
+    , div [ class "conclusion" ] [ viewStatement idx False conclusion ]
     ]
 
 
-renderEnumeratedProof : EnumeratedProof -> Html Msg
-renderEnumeratedProof proof =
+viewEnumeratedProof : EnumeratedProof -> Html Msg
+viewEnumeratedProof proof =
   case proof of
     Tree.Node (idx, statement) [] ->
-      renderAssumption idx statement
+      viewAssumption idx statement
 
     Tree.Node (idx, conclusion) premises ->
-      renderSubproof idx conclusion premises
+      viewSubproof idx conclusion premises
 
 
-renderProof : Proof -> Html Msg
-renderProof = renderEnumeratedProof << Tree.enumerate
+viewProof : Proof -> Html Msg
+viewProof = viewEnumeratedProof << Tree.enumerate
 
 
 view : Model -> Browser.Document Msg
@@ -209,7 +209,7 @@ view model =
         [ h1 [] [ text "Gentzen proof editor"]
         -- The drawing surface
         , div [ class "proof-area" ]
-            [ renderProof model.proof
+            [ viewProof model.proof
             ]
         ]
       ]
