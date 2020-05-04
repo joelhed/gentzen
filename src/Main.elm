@@ -166,7 +166,7 @@ renderStatement idx renderDischargeBrackets (Statement s isDischarged) =
 
 renderAssumption : Int -> Statement -> Html Msg
 renderAssumption idx statement =
-  div []
+  div [ class "assumption" ]
     [ hr [ class "assumption-line" , onClick (AddPremise idx) ] []
     , renderStatement idx True statement
     ]

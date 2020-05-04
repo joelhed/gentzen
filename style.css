@@ -4,6 +4,7 @@ body {
 
 button {
   background-color: transparent;
+  color: #CCC;
   border: none;
 }
 
@@ -26,12 +27,12 @@ input:hover {
 
 .proof-area {
   font-family: Times new roman, serif;
-  background-color: #F0F0F0;
+  background-color: #F4F4F4;
   padding: 10px;
   border-radius: 5px;
   text-align: center;
 
-  min-height: 50vh;
+  min-height: 60vh;
   position: relative;
 
   /* for vertical scroll */
@@ -44,7 +45,7 @@ input:hover {
   position: relative;
 }
 
-.proof-area > .proof {
+.proof-area > .proof, .proof-area > .assumption {
   position: absolute;
   left: 0;
   right: 0;
@@ -114,6 +115,7 @@ input:hover {
   */
   height: 10px;
   width: 75%;
+  margin-bottom: 5px;
 }
 
 .assumption-line:hover {
